@@ -1,0 +1,101 @@
+/* pages/crisis/crisis.wxss */
+.page-crisis {
+  min-height: 100vh;
+  background: linear-gradient(180deg, rgba(232,90,90,0.04) 0%, #f8f6fc 30%);
+  padding-bottom: 80rpx;
+}
+
+.crisis-hero {
+  padding: 64rpx 48rpx 48rpx;
+  text-align: center;
+}
+.ch-emoji { font-size: 120rpx; margin-bottom: 24rpx; }
+.ch-title { font-size: 40rpx; font-weight: 700; color: #2d2a35; margin-bottom: 16rpx; }
+.ch-desc {
+  font-size: 26rpx;
+  color: #7a7485;
+  line-height: 1.7;
+}
+
+.section { margin: 0 32rpx 32rpx; }
+
+/* 热线卡 */
+.hotline-card {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 28rpx 32rpx;
+  margin-bottom: 16rpx;
+  border: 1rpx solid rgba(232, 90, 90, 0.1);
+  border-left: 8rpx solid #e85a5a;
+}
+.hotline-card:active { transform: scale(0.98); }
+.hc-icon { font-size: 40rpx; }
+.hc-info { flex: 1; }
+.hc-name { font-size: 28rpx; font-weight: 700; color: #2d2a35; }
+.hc-time { font-size: 22rpx; color: #7a7485; margin-top: 4rpx; }
+.hc-phone {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #e85a5a;
+}
+
+/* 紧急 */
+.emergency-card {
+  border: 2rpx solid rgba(232, 90, 90, 0.3);
+  background: rgba(232, 90, 90, 0.04);
+  padding: 32rpx;
+}
+.ec-title { font-size: 30rpx; font-weight: 700; color: #e85a5a; margin-bottom: 12rpx; }
+.ec-desc { font-size: 24rpx; color: #2d2a35; line-height: 1.6; margin-bottom: 20rpx; }
+.ec-row { display: flex; gap: 16rpx; }
+.ec-btn {
+  flex: 1;
+  text-align: center;
+  padding: 20rpx;
+  background: #e85a5a;
+  color: #fff;
+  border-radius: 16rpx;
+  font-size: 28rpx;
+  font-weight: 700;
+}
+.ec-btn:active { opacity: 0.85; }
+
+/* 着陆练习 */
+.ground-card { padding: 32rpx; }
+.gc-title {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #2d2a35;
+  margin-bottom: 24rpx;
+}
+.gc-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 16rpx;
+  padding: 12rpx 0;
+}
+.gc-num {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #8b6fd4, #f08a7a);
+  color: #fff;
+  font-size: 22rpx;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.gc-text { font-size: 26rpx; color: #2d2a35; line-height: 1.6; }
+
+.footer {
+  margin: 48rpx 32rpx;
+  text-align: center;
+  font-size: 24rpx;
+  color: #7a7485;
+  line-height: 1.8;
+}

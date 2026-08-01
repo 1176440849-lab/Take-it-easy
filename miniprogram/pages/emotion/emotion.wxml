@@ -1,0 +1,315 @@
+<!-- pages/emotion/emotion.wxml - 情绪地图页 -->
+<view class="page-emotion">
+
+  <view class="page-header">
+    <view class="ph-back" bindtap="goBack">‹</view>
+    <view class="ph-title">情绪地图</view>
+    <view class="ph-desc">让情绪被看见，是照顾自己的开始</view>
+  </view>
+
+  <!-- 今日情绪记录卡 -->
+  <view class="section">
+    <view class="card record-card">
+      <block wx:if="{{todayRecord}}">
+        <view class="rc-done">
+          <view class="rc-done-emoji">{{todayRecord.emoji}}</view>
+          <view class="rc-done-info">
+            <view class="rc-done-title">今日心情 · {{todayRecord.score}}/10</view>
+            <view class="rc-done-label">{{todayRecord.scoreLabel}}</view>
+            <view class="rc-done-tags" wx:if="{{todayRecord.tagsText}}">{{todayRecord.tagsText}}</view>
+          </view>
+          <view class="rc-done-edit" bindtap="editToday">修改</view>
+        </view>
+      </block>
+      <block wx:else>
+        <view class="rc-prompt">
+          <view class="rc-prompt-emoji">🌸</view>
+          <view class="rc-prompt-title">今天还没记录心情</view>
+          <view class="rc-prompt-desc">花30秒，给自己一个被看见的机会</view>
+          <view class="btn btn-primary btn-block" bindtap="startRecord">现在记录</view>
+        </view>
+      </block>
+    </view>
+  </view>
+
+  <!-- 情绪记录表单 -->
+  <view class="section" wx:if="{{showForm}}">
+    <view class="card form-card">
+      <view class="form-title">{{formTitle}}</view>
+
+      <!-- 分数滑块 -->
+      <view class="form-block">
+        <view class="block-label">此刻你的心情是几分？</view>
+        <view class="score-display">
+          <view class="score-value" style="color:{{scoreColor}}">{{score}}</view>
+          <view class="score-label" style="color:{{scoreColor}}">{{scoreLabel}}</view>
+        </view>
+        <slider
+          class="score-slider"
+          min="1"
+          max="10"
+          value="{{score}}"
+          step="1"
+          block-size="32"
+          activeColor="{{scoreColor}}"
+          backgroundColor="#e8e4f0"
+          block-color="#fff"
+          bindchanging="onScoreChanging"
+          bindchange="onScoreChange" />
+        <view class="score-scale">
+          <text>1 很糟糕</text>
+          <text>10 很好</text>
+        </view>
+      </view>
+
+      <!-- 情绪标签 -->
+      <view class="form-block">
+        <view class="block-label">具体感受（可多选）</view>
+        <view class="tag-list">
+          <view
+            wx:for="{{emotionTags}}"
+            wx:key="id"
+            class="tag-item {{selectedTags[item.id] ? 'selected' : ''}}"
+            style="{{selectedTags[item.id] ? 'background:'+item.color+';color:#fff;border-color:'+item.color : 'color:'+item.color+';border-color:'+item.color}}"
+            bindtap="toggleTag"
+            data-id="{{item.id}}">
+            <text>{{item.emoji}}</text>
+            <text>{{item.label}}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 触发来源 -->
+      <view class="form-block">
+        <view class="block-label">触发来源（可选）</view>
+        <view class="trigger-list">
+          <view
+            wx:for="{{triggerSources}}"
+            wx:key="*this"
+            class="trigger-item {{selectedTrigger === item ? 'selected' : ''}}"
+            bindtap="selectTrigger"
+            data-trigger="{{item}}">
+            {{item}}
+          </view>
+        </view>
+      </view>
+
+      <!-- 备注 -->
+      <view class="form-block">
+        <view class="block-label">想说点什么？（可选）</view>
+        <textarea
+          class="form-note"
+          value="{{note}}"
+          bindinput="onNoteInput"
+          placeholder="发生了什么？身体有什么感受？想说什么就写什么..."
+          placeholder-class="note-ph"
+          maxlength="200"
+          auto-height
+          show-confirm-bar="{{false}}" />
+        <view class="note-count">{{note.length}}/200</view>
+      </view>
+
+      <!-- 操作 -->
+      <view class="form-actions">
+        <view class="btn btn-ghost" bindtap="cancelForm">取消</view>
+        <view class="btn btn-primary" bindtap="saveRecord">保存</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 7天趋势 -->
+  <view class="section" wx:if="{{!showForm && records.length > 0}}">
+    <view class="section-title">最近7天</view>
+    <view class="card trend-card">
+      <view class="trend-chart">
+        <view class="trend-yaxis">
+          <text>10</text>
+          <text>8</text>
+          <text>6</text>
+          <text>4</text>
+          <text>2</text>
+          <text>0</text>
+        </view>
+        <view class="trend-bars">
+          <view class="trend-col" wx:for="{{weekData}}" wx:key="date">
+            <view class="trend-bar-wrap">
+              <view class="trend-bar" wx:if="{{item.score > 0}}" style="height:{{item.barHeight}}%;background:{{item.color}}"></view>
+              <view class="trend-empty" wx:else></view>
+            </view>
+            <view class="trend-day">{{item.short}}</view>
+            <view class="trend-date">{{item.dateShort}}</view>
+          </view>
+        </view>
+      </view>
+      <view class="trend-summary">
+        <view class="ts-item">
+          <view class="ts-label">7天均分</view>
+          <view class="ts-value">{{trendSummary.avg}}</view>
+        </view>
+        <view class="ts-item">
+          <view class="ts-label">最高</view>
+          <view class="ts-value" style="color:#4caf7d">{{trendSummary.max}}</view>
+        </view>
+        <view class="ts-item">
+          <view class="ts-label">最低</view>
+          <view class="ts-value" style="color:#e85a5a">{{trendSummary.min}}</view>
+        </view>
+        <view class="ts-item">
+          <view class="ts-label">已记录</view>
+          <view class="ts-value">{{trendSummary.count}}/7</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 模式洞察（≥7天数据时启用） -->
+  <view class="section" wx:if="{{!showForm && records.length >= 7}}">
+    <view class="section-title">模式洞察</view>
+    <view class="card insight-card">
+      <view class="insight-icon">🔍</view>
+      <view class="insight-content">
+        <view class="insight-text">{{insightText}}</view>
+        <view class="insight-tip">基于最近{{records.length}}天情绪数据 AI分析</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 月度热力图 -->
+  <view class="section" wx:if="{{!showForm && records.length > 0}}">
+    <view class="section-title">月度热力图</view>
+    <view class="card heatmap-card">
+      <view class="heatmap-header">
+        <view class="hm-nav" bindtap="prevMonth">‹</view>
+        <view class="hm-title">{{heatmapTitle}}</view>
+        <view class="hm-nav" bindtap="nextMonth">›</view>
+      </view>
+      <view class="heatmap-weekdays">
+        <text>日</text><text>一</text><text>二</text><text>三</text><text>四</text><text>五</text><text>六</text>
+      </view>
+      <view class="heatmap-grid">
+        <view
+          wx:for="{{heatmapDays}}"
+          wx:key="key"
+          class="hm-cell {{item.empty ? 'empty' : ''}} {{item.today ? 'today' : ''}}"
+          style="{{!item.empty && item.score > 0 ? 'background:'+item.color : ''}}"
+          bindtap="tapHeatCell"
+          data-date="{{item.date}}"
+          data-score="{{item.score}}">
+          <text wx:if="{{!item.empty}}" class="hm-day">{{item.day}}</text>
+          <text wx:if="{{!item.empty && item.score > 0}}" class="hm-score">{{item.score}}</text>
+        </view>
+      </view>
+      <view class="heatmap-legend">
+        <text class="legend-label">低</text>
+        <view class="legend-cell" style="background:#e85a5a"></view>
+        <view class="legend-cell" style="background:#e8a838"></view>
+        <view class="legend-cell" style="background:#8b6fd4"></view>
+        <view class="legend-cell" style="background:#4caf7d"></view>
+        <text class="legend-label">高</text>
+        <text class="legend-tip">· 已记录 {{monthRecordCount}} 天</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 30天趋势线图 -->
+  <view class="section" wx:if="{{!showForm && records.length >= 3}}">
+    <view class="section-title">30天趋势</view>
+    <view class="card trend30-card">
+      <view class="t30-stats">
+        <view class="t30-stat">
+          <view class="t30-label">30天均分</view>
+          <view class="t30-value">{{trend30.avg}}</view>
+        </view>
+        <view class="t30-stat">
+          <view class="t30-label">记录天数</view>
+          <view class="t30-value">{{trend30.count}}<text class="t30-unit">/30</text></view>
+        </view>
+        <view class="t30-stat">
+          <view class="t30-label">变化</view>
+          <view class="t30-value" style="color:{{trend30.deltaColor}}">{{trend30.deltaText}}</view>
+        </view>
+      </view>
+      <!-- 折线图 -->
+      <view class="t30-chart">
+        <view class="t30-yaxis">
+          <text>10</text><text>7</text><text>5</text><text>3</text><text>0</text>
+        </view>
+        <view class="t30-plot">
+          <view class="t30-grid"></view>
+          <view class="t30-grid"></view>
+          <view class="t30-grid"></view>
+          <view class="t30-grid"></view>
+          <view class="t30-line-wrap">
+            <!-- 折线（用多个小柱+连接点近似） -->
+            <view
+              wx:for="{{trend30.points}}"
+              wx:key="idx"
+              class="t30-point"
+              style="left:{{item.left}}%;bottom:{{item.bottom}}%;background:{{item.color}}">
+            </view>
+            <view
+              wx:for="{{trend30.bars}}"
+              wx:key="idx"
+              class="t30-bar"
+              style="left:{{item.left}}%;height:{{item.height}}rpx;background:{{item.color}}">
+            </view>
+          </view>
+        </view>
+      </view>
+      <view class="t30-xaxis">
+        <text>{{trend30.xStart}}</text>
+        <text>{{trend30.xMid}}</text>
+        <text>{{trend30.xEnd}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 历史记录 -->
+  <view class="section" wx:if="{{!showForm && records.length > 0}}">
+    <view class="section-title">历史记录</view>
+    <view class="history-list">
+      <view class="card history-item" wx:for="{{historyList}}" wx:key="id">
+        <view class="hi-header">
+          <view class="hi-date">{{item.dateText}}</view>
+          <view class="hi-score" style="color:{{item.scoreColor}}">{{item.score}}/10</view>
+        </view>
+        <view class="hi-tags" wx:if="{{item.tags.length}}">
+          <text class="hi-tag" wx:for="{{item.tags}}" wx:for-item="tag" wx:key="id" style="color:{{tag.color}};background:{{tag.color}}22">{{tag.emoji}}{{tag.label}}</text>
+        </view>
+        <view class="hi-trigger" wx:if="{{item.trigger_source}}">触发：{{item.trigger_source}}</view>
+        <view class="hi-note" wx:if="{{item.note}}">{{item.note}}</view>
+      </view>
+    </view>
+    <view class="load-more" wx:if="{{hasMoreHistory}}" bindtap="loadMore">加载更多</view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="section" wx:if="{{!showForm && records.length === 0}}">
+    <view class="empty-state">
+      <view class="empty-emoji">🌱</view>
+      <view class="empty-text">还没有情绪记录</view>
+      <view class="empty-desc">每天记录一次，7天后解锁模式洞察</view>
+    </view>
+  </view>
+
+</view>
+
+<!-- 情绪数据授权弹窗（首次使用时） -->
+<view class="modal-mask" wx:if="{{showAuthModal}}" catchtap="noop">
+  <view class="auth-modal" catchtap="noop">
+    <view class="am-icon">🔐</view>
+    <view class="am-title">情绪数据授权</view>
+    <view class="am-desc">
+      情绪记录功能需要收集你的情绪分数、感受标签和备注。这些数据属于敏感个人信息，根据《个人信息保护法》要求，需要你单独授权。
+    </view>
+    <view class="am-points">
+      <view class="am-point">• 数据仅存储在你的设备本地，不会上传</view>
+      <view class="am-point">• 你可以随时在"我的"页清除全部数据</view>
+      <view class="am-point">• 拒绝授权不影响其他功能使用</view>
+    </view>
+    <view class="am-actions">
+      <view class="btn btn-ghost" bindtap="rejectAuth">暂不授权</view>
+      <view class="btn btn-primary" bindtap="agreeAuth">同意并继续</view>
+    </view>
+  </view>
+</view>

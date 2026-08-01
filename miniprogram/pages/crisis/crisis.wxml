@@ -1,0 +1,86 @@
+<!-- pages/crisis/crisis.wxml - 危机干预页 -->
+<view class="page-crisis">
+
+  <view class="crisis-hero">
+    <view class="ch-emoji">🤝</view>
+    <view class="ch-title">你不必一个人扛</view>
+    <view class="ch-desc">如果你正在经历强烈的痛苦，或有伤害自己的想法，请立即拨打以下电话。会有专业的人陪你一起面对。</view>
+  </view>
+
+  <view class="section">
+    <view class="hotline-card" bindtap="call" data-phone="400-161-9995">
+      <view class="hc-icon">📞</view>
+      <view class="hc-info">
+        <view class="hc-name">全国心理援助热线</view>
+        <view class="hc-time">24小时 · 全国统一</view>
+      </view>
+      <view class="hc-phone">400-161-9995</view>
+    </view>
+
+    <view class="hotline-card" bindtap="call" data-phone="010-82951332">
+      <view class="hc-icon">📞</view>
+      <view class="hc-info">
+        <view class="hc-name">北京心理危机研究与干预中心</view>
+        <view class="hc-time">24小时</view>
+      </view>
+      <view class="hc-phone">010-82951332</view>
+    </view>
+
+    <view class="hotline-card" bindtap="call" data-phone="400-821-1215">
+      <view class="hc-icon">📞</view>
+      <view class="hc-info">
+        <view class="hc-name">希望24热线</view>
+        <view class="hc-time">24小时 · 生命教育与危机干预</view>
+      </view>
+      <view class="hc-phone">400-821-1215</view>
+    </view>
+
+    <view class="hotline-card" bindtap="call" data-phone="021-12320-5">
+      <view class="hc-icon">📞</view>
+      <view class="hc-info">
+        <view class="hc-name">上海市心理援助热线</view>
+        <view class="hc-time">24小时</view>
+      </view>
+      <view class="hc-phone">021-12320-5</view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="card emergency-card">
+      <view class="ec-title">紧急情况</view>
+      <view class="ec-desc">如果你正处于紧急危险中，或身边有人面临生命威胁，请立即拨打：</view>
+      <view class="ec-row">
+        <view class="ec-btn" bindtap="call" data-phone="110">110 报警</view>
+        <view class="ec-btn" bindtap="call" data-phone="120">120 急救</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="card ground-card">
+      <view class="gc-title">在等待接通时，试试这样</view>
+      <view class="gc-step">
+        <view class="gc-num">1</view>
+        <view class="gc-text">深吸气4秒——慢慢数1、2、3、4</view>
+      </view>
+      <view class="gc-step">
+        <view class="gc-num">2</view>
+        <view class="gc-text">屏住呼吸7秒——让空气停留在身体里</view>
+      </view>
+      <view class="gc-step">
+        <view class="gc-num">3</view>
+        <view class="gc-text">缓慢呼气8秒——把紧张一并吐出</view>
+      </view>
+      <view class="gc-step">
+        <view class="gc-num">4</view>
+        <view class="gc-text">重复4次。你会感觉到心跳变慢，身体稍稍放松</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="footer">
+    <view class="footer-line">你的痛苦不会永远持续。求救是勇敢的表现。</view>
+    <view class="footer-line">请相信，有人愿意接住你。</view>
+  </view>
+
+</view>

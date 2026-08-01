@@ -1,0 +1,110 @@
+<!-- pages/home/home.wxml - 首页 -->
+<view class="page-home">
+  <!-- 顶部Hero区 -->
+  <view class="hero">
+    <view class="hero-badge">情绪健康 · V1.0</view>
+    <view class="hero-title">缓一缓</view>
+    <view class="hero-tagline">焦虑爆发时，给你一个着陆的地方</view>
+    <view class="hero-quote" wx:if="{{todayRecord}}">
+      <text class="quote-label">今日情绪</text>
+      <text class="quote-score" style="color:{{todayRecord.scoreColor}}">{{todayRecord.score}}/10 · {{todayRecord.scoreLabel}}</text>
+    </view>
+  </view>
+
+  <!-- 主要急救入口（大卡片） -->
+  <view class="section">
+    <view class="entry-main" bindtap="goChat" hover-class="card-hover">
+      <view class="entry-main-left">
+        <view class="entry-main-title">情绪急救</view>
+        <view class="entry-main-desc">AI陪你说说话，3分钟回到当下</view>
+        <view class="entry-main-meta">
+          <text class="meta-tag">免费 {{remaining}}/{{limit}} 次</text>
+          <text class="meta-tag meta-tag-ghost" wx:if="{{aiMode==='mock'}}">演示模式</text>
+        </view>
+      </view>
+      <view class="entry-main-icon">🫧</view>
+    </view>
+  </view>
+
+  <!-- 功能入口网格 -->
+  <view class="section">
+    <view class="section-title">情绪工具箱</view>
+    <view class="entry-grid">
+      <view class="entry-cell" bindtap="goMeditation" hover-class="cell-hover">
+        <view class="cell-icon" style="background:rgba(91,71,149,0.12);color:#6b5b95">🌙</view>
+        <view class="cell-title">微冥想</view>
+        <view class="cell-desc">失眠场景</view>
+        <view class="cell-tag tag tag-mvp">MVP</view>
+      </view>
+
+      <view class="entry-cell" bindtap="goEmotion" hover-class="cell-hover">
+        <view class="cell-icon" style="background:rgba(76,175,125,0.12);color:#4caf7d">📊</view>
+        <view class="cell-title">情绪地图</view>
+        <view class="cell-desc">每日记录</view>
+        <view class="cell-tag tag tag-mvp">MVP</view>
+      </view>
+
+      <view class="entry-cell" bindtap="goShield" hover-class="cell-hover">
+        <view class="cell-icon" style="background:rgba(232,168,56,0.12);color:#e8a838">🔇</view>
+        <view class="cell-title">压力屏蔽</view>
+        <view class="cell-desc">勿扰时段</view>
+        <view class="cell-tag tag tag-mvp">新</view>
+      </view>
+
+      <view class="entry-cell" bindtap="goCommunity" hover-class="cell-hover">
+        <view class="cell-icon" style="background:rgba(240,138,122,0.12);color:#f08a7a">🌳</view>
+        <view class="cell-title">树洞广场</view>
+        <view class="cell-desc">匿名倾诉</view>
+        <view class="cell-tag tag tag-mvp">新</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 今日心情记录引导（仅未记录时显示） -->
+  <view class="section" wx:if="{{!todayRecord}}">
+    <view class="prompt-card">
+      <view class="prompt-emoji">🌿</view>
+      <view class="prompt-text">
+        <view class="prompt-title">今天的心情怎么样？</view>
+        <view class="prompt-desc">花30秒记录一下，让情绪被看见</view>
+      </view>
+      <view class="btn btn-primary btn-sm" bindtap="goEmotion">去记录</view>
+    </view>
+  </view>
+
+  <!-- 7天情绪趋势小图 -->
+  <view class="section" wx:if="{{recentRecords.length >= 3}}">
+    <view class="section-title">最近7天</view>
+    <view class="card mini-trend">
+      <view class="mini-trend-bars">
+        <view class="bar-col" wx:for="{{weekData}}" wx:key="date">
+          <view class="bar" style="height:{{item.barHeight}}rpx;background:{{item.color}}"></view>
+          <view class="bar-label">{{item.short}}</view>
+        </view>
+      </view>
+      <view class="mini-trend-footer" bindtap="goEmotion">
+        <text>查看详情</text>
+        <text class="arrow">›</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 免责声明 -->
+  <view class="disclaimer">
+    <view>本工具不能替代专业医疗诊断。如持续情绪困扰，请寻求专业帮助。</view>
+    <view>危机干预热线：400-161-9995</view>
+  </view>
+</view>
+
+<!-- 每日情绪引导弹窗 -->
+<view class="modal-mask" wx:if="{{showDailyModal}}" bindtap="closeDailyModal">
+  <view class="modal-body" catchtap="noop">
+    <view class="modal-emoji">🌸</view>
+    <view class="modal-title">先花30秒，停一下</view>
+    <view class="modal-desc">此刻你的心情是几分？记录情绪，是照顾自己的第一步。</view>
+    <view class="modal-actions">
+      <view class="btn btn-ghost" bindtap="closeDailyModal">稍后再说</view>
+      <view class="btn btn-primary" bindtap="goEmotionFromModal">现在记录</view>
+    </view>
+  </view>
+</view>

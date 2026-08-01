@@ -1,0 +1,138 @@
+<!-- pages/settings/settings.wxml - AI 接口配置 -->
+<view class="page-settings">
+
+  <view class="page-header">
+    <view class="ph-title">AI 接口配置</view>
+    <view class="ph-desc">配置自己的大模型API，解锁无限对话额度</view>
+  </view>
+
+  <!-- 当前模式 -->
+  <view class="section">
+    <view class="card mode-card">
+      <view class="mode-icon">{{isMockMode ? '🎭' : '✨'}}</view>
+      <view class="mode-info">
+        <view class="mode-title">{{isMockMode ? '演示模式' : '自定义模式'}}</view>
+        <view class="mode-desc">
+          {{isMockMode ? '使用内置模拟回复，每日限3次对话' : '使用你配置的LLM API，对话无限制'}}
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 配置表单 -->
+  <view class="section">
+    <view class="card form-card">
+
+      <view class="form-block">
+        <view class="block-label">接口地址 Endpoint</view>
+        <input
+          class="form-input"
+          value="{{config.endpoint}}"
+          bindinput="onInput"
+          data-field="endpoint"
+          placeholder="https://api.example.com/v1/chat/completions"
+          placeholder-class="input-ph" />
+        <view class="block-tip">OpenAI兼容协议的 /v1/chat/completions 接口</view>
+      </view>
+
+      <view class="form-block">
+        <view class="block-label">API Key</view>
+        <view class="input-with-action">
+          <input
+            class="form-input"
+            value="{{config.apiKey}}"
+            bindinput="onInput"
+            data-field="apiKey"
+            placeholder="sk-..."
+            placeholder-class="input-ph"
+            password="{{!showKey}}" />
+          <view class="input-suffix" bindtap="toggleShowKey">{{showKey ? '隐藏' : '显示'}}</view>
+        </view>
+        <view class="block-tip">密钥仅存储在你的设备本地，不会上传</view>
+      </view>
+
+      <view class="form-block">
+        <view class="block-label">模型名称 Model</view>
+        <input
+          class="form-input"
+          value="{{config.model}}"
+          bindinput="onInput"
+          data-field="model"
+          placeholder="gpt-3.5-turbo / glm-4 / qwen-plus ..."
+          placeholder-class="input-ph" />
+        <view class="block-tip">填写接口支持的模型ID</view>
+      </view>
+
+      <view class="form-block">
+        <view class="block-label">System Prompt（可选）</view>
+        <textarea
+          class="form-textarea"
+          value="{{config.systemPrompt}}"
+          bindinput="onInput"
+          data-field="systemPrompt"
+          placeholder="留空则使用内置的情绪急救Prompt..."
+          placeholder-class="input-ph"
+          maxlength="2000"
+          auto-height
+          show-confirm-bar="{{false}}" />
+      </view>
+
+      <view class="form-actions">
+        <view class="btn btn-ghost" bindtap="testConnection" wx:if="{{!isMockMode}}">测试连接</view>
+        <view class="btn btn-primary" bindtap="saveConfig">保存配置</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 预设服务商 -->
+  <view class="section">
+    <view class="section-title">快速预设</view>
+    <view class="preset-list">
+      <view class="preset-card" bindtap="usePreset" data-preset="glm">
+        <view class="preset-name">智谱 GLM</view>
+        <view class="preset-desc">GLM-4 · 国内可直连</view>
+        <view class="preset-endpoint">https://open.bigmodel.cn/api/paas/v4/chat/completions</view>
+      </view>
+      <view class="preset-card" bindtap="usePreset" data-preset="qwen">
+        <view class="preset-name">通义千问</view>
+        <view class="preset-desc">qwen-plus · 阿里云</view>
+        <view class="preset-endpoint">https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions</view>
+      </view>
+      <view class="preset-card" bindtap="usePreset" data-preset="wenxin">
+        <view class="preset-name">文心一言</view>
+        <view class="preset-desc">ernie-bot · 百度</view>
+        <view class="preset-endpoint">https://qianfan.baidubce.com/v2/chat/completions</view>
+      </view>
+      <view class="preset-card" bindtap="usePreset" data-preset="doubao">
+        <view class="preset-name">豆包</view>
+        <view class="preset-desc">doubao-pro · 字节</view>
+        <view class="preset-endpoint">https://ark.cn-beijing.volces.com/api/v3/chat/completions</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 说明 -->
+  <view class="section">
+    <view class="callout">
+      <view class="callout-title">📋 配置说明</view>
+      <view class="callout-text">
+        1. 此处配置的API将直接由你的设备调用，请求和密钥不会经过我们的服务器。
+      </view>
+      <view class="callout-text">
+        2. 接口需符合OpenAI Chat Completions协议（POST、Authorization: Bearer、messages数组）。
+      </view>
+      <view class="callout-text">
+        3. 配置成功后，AI对话将走你设置的接口，每日对话额度限制自动解除。
+      </view>
+      <view class="callout-text">
+        4. 若API调用失败，会自动降级到演示模式。
+      </view>
+    </view>
+  </view>
+
+  <!-- 重置为演示模式 -->
+  <view class="section" wx:if="{{!isMockMode}}">
+    <view class="btn btn-ghost btn-block" bindtap="resetToMock">恢复为演示模式</view>
+  </view>
+
+</view>

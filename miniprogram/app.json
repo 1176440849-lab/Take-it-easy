@@ -1,0 +1,62 @@
+{
+  "pages": [
+    "pages/home/home",
+    "pages/meditation/meditation",
+    "pages/community/community",
+    "pages/profile/profile",
+    "pages/emotion/emotion",
+    "pages/chat/chat",
+    "pages/community-detail/community-detail",
+    "pages/shield/shield",
+    "pages/settings/settings",
+    "pages/crisis/crisis",
+    "pages/coming-soon/coming-soon"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTitleText": "缓一缓",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#f8f6fc"
+  },
+  "tabBar": {
+    "color": "#7a7485",
+    "selectedColor": "#8b6fd4",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/home/home",
+        "text": "首页",
+        "iconPath": "assets/tab/home.png",
+        "selectedIconPath": "assets/tab/home-active.png"
+      },
+      {
+        "pagePath": "pages/meditation/meditation",
+        "text": "冥想",
+        "iconPath": "assets/tab/meditation.png",
+        "selectedIconPath": "assets/tab/meditation-active.png"
+      },
+      {
+        "pagePath": "pages/community/community",
+        "text": "树洞",
+        "iconPath": "assets/tab/tree.png",
+        "selectedIconPath": "assets/tab/tree-active.png"
+      },
+      {
+        "pagePath": "pages/profile/profile",
+        "text": "我的",
+        "iconPath": "assets/tab/profile.png",
+        "selectedIconPath": "assets/tab/profile-active.png"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json",
+  "lazyCodeLoading": "requiredComponents",
+  "permission": {
+    "scope.userLocation": {
+      "desc": "用于情绪记录中的环境标签（可选）"
+    }
+  }
+}

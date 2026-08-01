@@ -1,0 +1,85 @@
+<!-- pages/community-detail/community-detail.wxml -->
+<view class="page-detail">
+
+  <!-- 顶部导航 -->
+  <view class="nav-bar" style="padding-top:{{statusBarHeight}}px">
+    <view class="nav-back" bindtap="onBack">‹</view>
+    <view class="nav-title">树洞</view>
+    <view class="nav-action" bindtap="showActions">⋯</view>
+  </view>
+
+  <scroll-view class="detail-scroll" scroll-y enhanced show-scrollbar="{{false}}">
+    <!-- 帖子正文 -->
+    <view class="post-detail">
+      <view class="pd-header">
+        <view class="pd-avatar" style="background:{{post.avatarColor}}">{{post.aliasChar}}</view>
+        <view class="pd-author">
+          <view class="pd-name">
+            {{post.alias}}
+            <text wx:if="{{post.isMine}}" class="pd-mine">我</text>
+          </view>
+          <view class="pd-meta">{{post.timeText}}</view>
+        </view>
+        <view class="pd-mood" wx:if="{{post.moodLabel}}" style="color:{{post.moodColor}};background:{{post.moodColor}}22">
+          {{post.moodEmoji}} {{post.moodLabel}}
+        </view>
+      </view>
+      <view class="pd-content">{{post.content}}</view>
+      <view class="pd-footer">
+        <view class="pd-action {{post.liked ? 'liked' : ''}}" bindtap="toggleLike">
+          <text class="pa-icon">{{post.liked ? '♥' : '♡'}}</text>
+          <text>{{post.likes}}</text>
+        </view>
+        <view class="pd-action">
+          <text class="pa-icon">💬</text>
+          <text>{{comments.length}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="divider"></view>
+
+    <!-- 评论列表 -->
+    <view class="comments-section">
+      <view class="cs-title">评论 {{comments.length}}</view>
+      <view wx:if="{{comments.length === 0}}" class="cs-empty">
+        还没有评论，做第一个回应ta的人
+      </view>
+      <view class="comment-item" wx:for="{{comments}}" wx:key="id">
+        <view class="c-avatar" style="background:{{item.avatarColor}}">{{item.aliasChar}}</view>
+        <view class="c-body">
+          <view class="c-name">{{item.alias}}</view>
+          <view class="c-text">{{item.content}}</view>
+          <view class="c-time">{{item.timeText}}</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="bottom-pad"></view>
+  </scroll-view>
+
+  <!-- 评论输入 -->
+  <view class="comment-bar" style="padding-bottom:{{safeBottom}}px">
+    <input
+      class="cb-input"
+      value="{{commentText}}"
+      bindinput="onCommentInput"
+      bindconfirm="submitComment"
+      placeholder="说点什么..."
+      placeholder-class="input-ph"
+      confirm-type="send"
+      cursor-spacing="20" />
+    <view class="cb-send {{commentText ? 'active' : ''}}" bindtap="submitComment">发送</view>
+  </view>
+
+</view>
+
+<!-- 操作菜单 -->
+<view class="modal-mask" wx:if="{{showActionSheet}}" catchtap="hideActions">
+  <view class="action-sheet" catchtap="noop">
+    <view class="as-item" bindtap="copyContent">复制内容</view>
+    <view class="as-item" wx:if="{{post.isMine}}" bindtap="deletePost">删除帖子</view>
+    <view class="as-item" wx:if="{{!post.isMine}}" bindtap="reportPost">举报</view>
+    <view class="as-item as-cancel" bindtap="hideActions">取消</view>
+  </view>
+</view>

@@ -1,0 +1,181 @@
+<!-- pages/community/community.wxml - 匿名树洞社区 -->
+<view class="page-community">
+
+  <view class="page-header">
+    <view class="ph-row">
+      <view>
+        <view class="ph-title">树洞广场</view>
+        <view class="ph-desc">匿名说说话，这里没有人认识你</view>
+      </view>
+      <view class="ph-alias" bindtap="changeAlias">
+        <view class="alias-avatar" style="background:{{userColor}}">{{userAliasChar}}</view>
+        <view class="alias-name">{{userAlias || '点击设置昵称'}}</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 心情筛选 -->
+  <scroll-view class="filter-bar" scroll-x show-scrollbar="{{false}}" enhanced>
+    <view class="filter-list">
+      <view class="filter-item {{!currentFilter ? 'active' : ''}}" bindtap="setFilter" data-mood="">全部</view>
+      <view
+        wx:for="{{moodFilters}}"
+        wx:key="id"
+        class="filter-item {{currentFilter === item.id ? 'active' : ''}}"
+        bindtap="setFilter"
+        data-mood="{{item.id}}">
+        {{item.emoji}} {{item.label}}
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- 帖子列表 -->
+  <view class="post-list">
+
+    <view wx:if="{{filteredPosts.length === 0}}" class="empty-state">
+      <view class="empty-emoji">🌳</view>
+      <view class="empty-text">树洞里还没有声音</view>
+      <view class="empty-desc">成为第一个倾诉的人</view>
+    </view>
+
+    <view
+      wx:for="{{filteredPosts}}"
+      wx:key="id"
+      class="card post-card"
+      bindtap="goDetail"
+      data-id="{{item.id}}">
+      <view class="post-header">
+        <view class="post-avatar" style="background:{{item.avatarColor}}">{{item.aliasChar}}</view>
+        <view class="post-author">
+          <view class="post-name">
+            {{item.alias}}
+            <text wx:if="{{item.isMine}}" class="post-mine">我</text>
+          </view>
+          <view class="post-meta">{{item.timeText}}</view>
+        </view>
+        <view class="post-mood" wx:if="{{item.moodLabel}}" style="color:{{item.moodColor}};background:{{item.moodColor}}22">
+          {{item.moodEmoji}} {{item.moodLabel}}
+        </view>
+      </view>
+      <view class="post-content">{{item.content}}</view>
+      <view class="post-footer">
+        <view class="post-action {{item.liked ? 'liked' : ''}}" catchtap="toggleLike" data-id="{{item.id}}">
+          <text class="pa-icon">{{item.liked ? '♥' : '♡'}}</text>
+          <text>{{item.likes}}</text>
+        </view>
+        <view class="post-action">
+          <text class="pa-icon">💬</text>
+          <text>{{item.commentCount}}</text>
+        </view>
+        <view class="post-action" catchtap="goDetail" data-id="{{item.id}}">
+          <text class="pa-icon">查看</text>
+          <text>›</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 浮动发帖按钮 -->
+  <view class="fab" bindtap="openPost" style="bottom:{{safeBottom + 120}}rpx">
+    <view class="fab-icon">✎</view>
+    <view class="fab-text">倾诉</view>
+  </view>
+
+  <!-- 社区公约 -->
+  <view class="convention">
+    <view class="conv-title">🌳 树洞公约</view>
+    <view class="conv-text">
+      <view class="conv-line">· 这里是匿名空间，请尊重每一位倾诉者</view>
+      <view class="conv-line">· 不评判、不说教、不鼓励伤害</view>
+      <view class="conv-line">· 看到他人的痛苦，一句"我也是"就够了</view>
+      <view class="conv-line">· 如发现违规内容，请点击举报</view>
+    </view>
+  </view>
+
+</view>
+
+<!-- 发帖弹窗 -->
+<view class="modal-mask" wx:if="{{showPostModal}}" catchtap="closePost">
+  <view class="post-modal" catchtap="noop">
+    <view class="pm-header">
+      <view class="pm-title">说点什么</view>
+      <view class="pm-close" bindtap="closePost">×</view>
+    </view>
+
+    <!-- 心情选择 -->
+    <view class="pm-block">
+      <view class="pm-label">此刻感受</view>
+      <view class="pm-moods">
+        <view
+          wx:for="{{moodFilters}}"
+          wx:key="id"
+          class="pm-mood {{selectedMood === item.id ? 'selected' : ''}}"
+          style="{{selectedMood === item.id ? 'background:'+item.color+';color:#fff;border-color:'+item.color : 'color:'+item.color+';border-color:'+item.color}}"
+          bindtap="selectMood"
+          data-mood="{{item.id}}">
+          {{item.emoji}} {{item.label}}
+        </view>
+      </view>
+    </view>
+
+    <!-- 内容 -->
+    <view class="pm-block">
+      <textarea
+        class="pm-textarea"
+        value="{{postContent}}"
+        bindinput="onPostInput"
+        placeholder="想到什么写什么，树洞会替你保守秘密..."
+        placeholder-class="input-ph"
+        maxlength="500"
+        auto-height
+        show-confirm-bar="{{false}}"
+        adjust-position="{{true}}" />
+      <view class="pm-count">{{postContent.length}}/500</view>
+    </view>
+
+    <view class="pm-tip">
+      发帖后将以「{{userAlias}}」的匿名身份发布。内容仅存储在你本地。
+    </view>
+
+    <view class="pm-actions">
+      <view class="btn btn-ghost" bindtap="closePost">取消</view>
+      <view class="btn btn-primary" bindtap="submitPost">发布</view>
+    </view>
+  </view>
+</view>
+
+<!-- 昵称修改弹窗 -->
+<view class="modal-mask" wx:if="{{showAliasModal}}" catchtap="closeAlias">
+  <view class="alias-modal" catchtap="noop">
+    <view class="am-title">你的树洞昵称</view>
+    <view class="am-desc">匿名身份，可随时修改</view>
+    <view class="am-preview">
+      <view class="alias-avatar am-preview-avatar" style="background:{{userColor}}">{{previewAliasChar}}</view>
+      <view class="am-preview-name">{{tempAlias || userAlias}}</view>
+    </view>
+    <view class="am-input-row">
+      <input
+        class="am-input"
+        value="{{tempAlias}}"
+        bindinput="onAliasInput"
+        placeholder="给自己起个名字..."
+        placeholder-class="input-ph"
+        maxlength="12" />
+      <view class="am-random" bindtap="randomAlias">🎲 随机</view>
+    </view>
+    <view class="am-colors">
+      <view
+        wx:for="{{aliasColors}}"
+        wx:key="*this"
+        class="am-color {{userColor === item ? 'selected' : ''}}"
+        style="background:{{item}}"
+        bindtap="selectColor"
+        data-color="{{item}}">
+      </view>
+    </view>
+    <view class="am-actions">
+      <view class="btn btn-ghost" bindtap="closeAlias">取消</view>
+      <view class="btn btn-primary" bindtap="saveAlias">保存</view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,181 @@
+<!-- pages/meditation/meditation.wxml - 微冥想页 -->
+<view class="page-meditation">
+
+  <!-- 列表态 -->
+  <view wx:if="{{mode === 'list'}}">
+    <view class="page-header">
+      <view class="ph-title">微冥想</view>
+      <view class="ph-desc">选一个场景，给自己几分钟</view>
+    </view>
+
+    <!-- 今日推荐 -->
+    <view class="recommand-card" wx:if="{{todayRecommend}}">
+      <view class="rc-bg" style="background:linear-gradient(135deg,{{todayRecommend.color}},{{todayRecommend.color}}aa)">
+        <view class="rc-content">
+          <view class="rc-tag">今日推荐</view>
+          <view class="rc-icon">{{todayRecommend.icon}}</view>
+          <view class="rc-title">{{todayRecommend.title}}</view>
+          <view class="rc-sub">{{todayRecommend.subtitle}}</view>
+          <view class="rc-btn" bindtap="enterScene" data-id="{{todayRecommend.id}}" wx:if="{{todayRecommend.available}}">
+            开始 · {{todayRecommend.durationText}}
+          </view>
+          <view class="rc-btn rc-btn-locked" wx:else>即将上线</view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 场景列表 -->
+    <view class="section">
+      <view class="section-title">全部场景</view>
+      <view class="scene-grid">
+        <view
+          wx:for="{{scenes}}"
+          wx:key="id"
+          class="scene-card {{!item.available ? 'locked' : ''}}"
+          bindtap="enterScene"
+          data-id="{{item.id}}">
+          <view class="scene-icon" style="background:{{item.color}}">{{item.icon}}</view>
+          <view class="scene-info">
+            <view class="scene-title">{{item.title}}</view>
+            <view class="scene-sub">{{item.subtitle}}</view>
+            <view class="scene-meta">
+              <text class="scene-duration">{{item.durationText}}</text>
+              <text wx:if="{{!item.available}}" class="scene-soon">即将上线</text>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 冥想记录 -->
+    <view class="section" wx:if="{{logs.length > 0}}">
+      <view class="section-title">最近的练习</view>
+      <view class="card">
+        <view class="log-item" wx:for="{{logs}}" wx:key="id">
+          <view class="log-icon">{{item.icon}}</view>
+          <view class="log-info">
+            <view class="log-title">{{item.sceneTitle}}</view>
+            <view class="log-meta">{{item.timeText}} · {{item.durationText}}</view>
+          </view>
+          <view class="log-complete" wx:if="{{item.completionRate >= 1}}">✓</view>
+        </view>
+      </view>
+    </view>
+
+    <view class="bottom-tip">
+      🌿 共6个场景，每个场景都有专属呼吸节奏。建议每天练习1-2次。
+    </view>
+  </view>
+
+  <!-- 播放态 -->
+  <view wx:if="{{mode === 'play'}}" class="play-mode" style="background:linear-gradient(180deg,{{currentScene.color}} 0%,{{currentScene.color}}cc 40%,#f8f6fc 100%)">
+    <!-- 顶部 -->
+    <view class="play-header">
+      <view class="play-back" bindtap="exitPlay">‹</view>
+      <view class="play-title">{{currentScene.title}}</view>
+      <view class="play-placeholder"></view>
+    </view>
+
+    <!-- 呼吸圆 -->
+    <view class="breath-area">
+      <view class="breath-ring {{breathing ? 'breathing' : ''}}" style="--ring-color:{{currentScene.color}}">
+        <view class="breath-core">
+          <text class="breath-text">{{breathText}}</text>
+        </view>
+      </view>
+      <view class="breath-desc">{{breathDesc}}</view>
+    </view>
+
+    <!-- 进度 -->
+    <view class="play-progress">
+      <view class="progress-bar">
+        <view class="progress-fill" style="width:{{progressPercent}}%"></view>
+      </view>
+      <view class="progress-meta">
+        <text>{{elapsedText}}</text>
+        <text>{{totalText}}</text>
+      </view>
+    </view>
+
+    <!-- 控制 -->
+    <view class="play-controls">
+      <view class="ctrl-btn ctrl-secondary" bindtap="seekBack">
+        <view class="ctrl-icon">«</view>
+        <text>15秒</text>
+      </view>
+      <view class="ctrl-btn ctrl-main" bindtap="togglePlay">
+        <view class="ctrl-play-icon">{{isPlaying ? '❚❚' : '▶'}}</view>
+      </view>
+      <view class="ctrl-btn ctrl-secondary" bindtap="seekForward">
+        <view class="ctrl-icon">»</view>
+        <text>15秒</text>
+      </view>
+    </view>
+
+    <!-- 背景音乐状态条 -->
+    <view class="bgm-bar" bindtap="toggleBgmPanel">
+      <block wx:for="{{bgmTypes}}" wx:key="id">
+        <view wx:if="{{item.id === currentBgm}}" class="bgm-current">
+          <text class="bgm-cur-icon">{{item.icon}}</text>
+          <view class="bgm-cur-text">
+            <text class="bgm-cur-name">{{item.name}}</text>
+            <text class="bgm-cur-desc" wx:if="{{item.id !== 'none'}}">{{item.desc}}</text>
+          </view>
+        </view>
+      </block>
+      <text class="bgm-bar-toggle {{showBgmPanel ? 'is-open' : ''}}">⌃</text>
+    </view>
+
+    <!-- BGM 选择面板（底部弹出） -->
+    <view class="bgm-panel-mask" wx:if="{{showBgmPanel}}" bindtap="toggleBgmPanel"></view>
+    <view class="bgm-panel {{showBgmPanel ? 'is-open' : ''}}" catchtap="noop">
+      <view class="bgm-panel-handle"></view>
+      <view class="bgm-panel-header">
+        <text class="bgm-panel-title">选择背景音</text>
+        <text class="bgm-panel-close" bindtap="toggleBgmPanel">✕</text>
+      </view>
+      <view class="bgm-grid">
+        <view
+          wx:for="{{bgmTypes}}"
+          wx:key="id"
+          class="bgm-item {{item.id === currentBgm ? 'active' : ''}}"
+          bindtap="selectBgm"
+          data-id="{{item.id}}">
+          <view class="bgm-item-icon">{{item.icon}}</view>
+          <view class="bgm-item-name">{{item.name}}</view>
+          <view class="bgm-item-desc">{{item.desc}}</view>
+        </view>
+      </view>
+      <view class="bgm-volume" wx:if="{{currentBgm !== 'none'}}">
+        <text class="bgm-volume-label">🔊 音量</text>
+        <slider
+          class="bgm-volume-slider"
+          min="0"
+          max="1"
+          step="0.05"
+          value="{{bgmVolume}}"
+          bindchange="onVolumeChange"
+          activeColor="#8b6fd4"
+          backgroundColor="rgba(139,111,212,0.15)"
+          block-size="20" />
+      </view>
+      <view class="bgm-panel-tip">提示：建议佩戴耳机，找一个安静的地方</view>
+    </view>
+  </view>
+
+</view>
+
+<!-- 播放完成弹窗 -->
+<view class="modal-mask" wx:if="{{showCompleteModal}}" catchtap="noop">
+  <view class="complete-modal" catchtap="noop">
+    <view class="cm-emoji">🌙</view>
+    <view class="cm-title">做得很好</view>
+    <view class="cm-desc">你刚刚为自己停留了{{elapsedText}}</view>
+    <view class="cm-divider"></view>
+    <view class="cm-question">现在感觉怎么样？</view>
+    <view class="cm-actions">
+      <view class="btn btn-ghost" bindtap="skipRecord">稍后记录</view>
+      <view class="btn btn-primary" bindtap="goEmotionRecord">记录情绪</view>
+    </view>
+  </view>
+</view>

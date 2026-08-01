@@ -1,0 +1,114 @@
+<!-- pages/profile/profile.wxml - 我的页 -->
+<view class="page-profile">
+
+  <!-- 头部 -->
+  <view class="profile-header">
+    <view class="avatar-wrap">
+      <view class="avatar">缓</view>
+    </view>
+    <view class="user-name">缓一缓用户</view>
+    <view class="user-tag">{{aiModeText}}</view>
+  </view>
+
+  <!-- 数据概览 -->
+  <view class="section">
+    <view class="stats-grid">
+      <view class="stat-item">
+        <view class="stat-value">{{stats.emotionDays}}</view>
+        <view class="stat-label">情绪记录</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-value">{{stats.chatSessions}}</view>
+        <view class="stat-label">AI对话</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-value">{{stats.meditationCount}}</view>
+        <view class="stat-label">冥想练习</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-value">{{stats.postCount}}</view>
+        <view class="stat-label">树洞发帖</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 今日额度 -->
+  <view class="section">
+    <view class="card quota-card">
+      <view class="quota-row">
+        <view class="quota-label">今日AI对话额度</view>
+        <view class="quota-value">{{quota.used}}/{{quota.max}}</view>
+      </view>
+      <view class="quota-bar">
+        <view class="quota-fill" style="width:{{quota.percent}}%"></view>
+      </view>
+      <view class="quota-tip">
+        <text wx:if="{{quota.remaining > 0}}">剩余 {{quota.remaining}} 次</text>
+        <text wx:else>今日额度已用完，明天再来</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 功能列表 -->
+  <view class="section">
+    <view class="card menu-card">
+      <view class="menu-item" bindtap="goSettings">
+        <view class="menu-icon" style="background:rgba(139,111,212,0.12);color:#8b6fd4">⚙️</view>
+        <view class="menu-info">
+          <view class="menu-title">AI 接口配置</view>
+          <view class="menu-desc">{{aiModeText}} · 点击配置自己的大模型API</view>
+        </view>
+        <view class="menu-arrow">›</view>
+      </view>
+
+      <view class="menu-item" bindtap="goShield">
+        <view class="menu-icon" style="background:rgba(232,168,56,0.12);color:#e8a838">🔇</view>
+        <view class="menu-info">
+          <view class="menu-title">社交压力屏蔽</view>
+          <view class="menu-desc">{{shieldStatusText}}</view>
+        </view>
+        <view class="menu-arrow">›</view>
+      </view>
+
+      <view class="menu-item" bindtap="goCrisis">
+        <view class="menu-icon" style="background:rgba(232,90,90,0.12);color:#e85a5a">🆘</view>
+        <view class="menu-info">
+          <view class="menu-title">危机干预热线</view>
+          <view class="menu-desc">24小时心理援助</view>
+        </view>
+        <view class="menu-arrow">›</view>
+      </view>
+
+      <view class="menu-item" bindtap="showDisclaimer">
+        <view class="menu-icon" style="background:rgba(232,168,56,0.12);color:#e8a838">📋</view>
+        <view class="menu-info">
+          <view class="menu-title">免责声明</view>
+          <view class="menu-desc">重要信息，请阅读</view>
+        </view>
+        <view class="menu-arrow">›</view>
+      </view>
+
+      <view class="menu-item" bindtap="clearData">
+        <view class="menu-icon" style="background:rgba(122,116,133,0.12);color:#7a7485">🗑</view>
+        <view class="menu-info">
+          <view class="menu-title">清除所有数据</view>
+          <view class="menu-desc">删除本地全部记录</view>
+        </view>
+        <view class="menu-arrow">›</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 关于 -->
+  <view class="section about">
+    <view class="about-title">关于缓一缓</view>
+    <view class="about-version">版本 {{version}} · V1.0</view>
+    <view class="about-text">
+      缓一缓是一款面向Z世代的轻量化情绪健康管理工具。当你焦虑爆发时，给你3分钟完成一次情绪着陆。
+    </view>
+    <view class="about-text">
+      本工具不能替代专业医疗诊断。如有持续情绪困扰，请寻求专业帮助。
+    </view>
+  </view>
+
+</view>

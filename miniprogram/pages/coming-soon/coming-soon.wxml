@@ -1,0 +1,20 @@
+<!-- pages/coming-soon/coming-soon.wxml -->
+<view class="page-coming">
+  <view class="coming-emoji">🌱</view>
+  <view class="coming-title">{{feature}}</view>
+  <view class="coming-status">即将上线</view>
+  <view class="coming-desc">
+    这个功能将在 V1.0 版本中推出。当前 MVP 阶段聚焦于核心的情绪急救能力，我们将根据50名种子用户的反馈持续优化。
+  </view>
+  <view class="coming-roadmap">
+    <view class="roadmap-item">
+      <view class="rm-dot active"></view>
+      <view class="rm-text">MVP（当前）：AI对话 + 失眠冥想 + 情绪记录</view>
+    </view>
+    <view class="roadmap-item">
+      <view class="rm-dot"></view>
+      <view class="rm-text">V1.0：5个冥想场景 + 情绪热力图 + {{feature}}</view>
+    </view>
+  </view>
+  <view class="btn btn-primary" bindtap="goBack">返回</view>
+</view>

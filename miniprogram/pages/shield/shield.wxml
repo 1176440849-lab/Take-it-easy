@@ -1,0 +1,153 @@
+<!-- pages/shield/shield.wxml - 社交压力屏蔽页 -->
+<view class="page-shield">
+
+  <view class="page-header">
+    <view class="ph-title">社交压力屏蔽</view>
+    <view class="ph-desc">给自己一个不被打扰的时段</view>
+  </view>
+
+  <!-- 总开关 -->
+  <view class="section">
+    <view class="card master-card {{config.enabled ? 'active' : ''}}">
+      <view class="master-icon">{{config.enabled ? '🌙' : '☀️'}}</view>
+      <view class="master-info">
+        <view class="master-title">{{config.enabled ? '屏蔽中' : '已关闭'}}</view>
+        <view class="master-desc">
+          {{config.enabled ? '勿扰时段：' + config.quietStart + ' - ' + config.quietEnd : '开启后将在指定时段屏蔽压力来源'}}
+        </view>
+      </view>
+      <switch checked="{{config.enabled}}" bindchange="toggleMaster" color="#8b6fd4" />
+    </view>
+  </view>
+
+  <!-- 勿扰时段 -->
+  <view class="section">
+    <view class="section-title">勿扰时段</view>
+    <view class="card time-card">
+      <view class="time-row">
+        <view class="time-label">开始</view>
+        <picker mode="time" value="{{config.quietStart}}" bindchange="onStartTimeChange">
+          <view class="time-value">{{config.quietStart}}</view>
+        </picker>
+      </view>
+      <view class="time-divider"></view>
+      <view class="time-row">
+        <view class="time-label">结束</view>
+        <picker mode="time" value="{{config.quietEnd}}" bindchange="onEndTimeChange">
+          <view class="time-value">{{config.quietEnd}}</view>
+        </picker>
+      </view>
+      <view class="time-tip">
+        在此时段内，被标记的应用通知将被静音，关键词消息将自动回复。
+      </view>
+    </view>
+  </view>
+
+  <!-- 应用屏蔽 -->
+  <view class="section">
+    <view class="section-title">压力来源屏蔽</view>
+    <view class="card apps-card">
+      <view class="apps-tip">
+        勾选你希望屏蔽的应用。注意：小程序无法真实控制其他APP，这里作为心理边界的提醒清单，帮你识别压力来源。
+      </view>
+      <view class="apps-list">
+        <view
+          wx:for="{{apps}}"
+          wx:key="id"
+          class="app-item {{item.blocked ? 'blocked' : ''}}">
+          <view class="app-icon">{{item.icon}}</view>
+          <view class="app-info">
+            <view class="app-name">{{item.name}}</view>
+            <view class="app-cat">{{item.category}}</view>
+          </view>
+          <switch checked="{{item.blocked}}" bindchange="toggleApp" data-id="{{item.id}}" color="#8b6fd4" />
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 关键词屏蔽 -->
+  <view class="section">
+    <view class="section-title">关键词屏蔽</view>
+    <view class="card keywords-card">
+      <view class="kw-tip">命中以下关键词的消息会被静音并自动回复：</view>
+      <view class="kw-tags">
+        <view class="kw-tag" wx:for="{{config.keywords}}" wx:key="*this">
+          {{item}}
+          <view class="kw-remove" catchtap="removeKeyword" data-kw="{{item}}">×</view>
+        </view>
+      </view>
+      <view class="kw-add-row">
+        <input
+          class="kw-input"
+          value="{{newKeyword}}"
+          bindinput="onKwInput"
+          placeholder="添加关键词..."
+          placeholder-class="input-ph"
+          confirm-type="done"
+          bindconfirm="addKeyword" />
+        <view class="kw-add-btn" bindtap="addKeyword">添加</view>
+      </view>
+      <view class="kw-suggest">
+        <text class="kw-suggest-label">建议：</text>
+        <view class="kw-suggest-tag" wx:for="{{keywordSuggestions}}" wx:key="*this" bindtap="addSuggestKeyword" data-kw="{{item}}">
+          {{item}}
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 自动回复 -->
+  <view class="section">
+    <view class="section-title">自动回复内容</view>
+    <view class="card reply-card">
+      <textarea
+        class="reply-text"
+        value="{{config.autoReply}}"
+        bindinput="onReplyInput"
+        placeholder="被屏蔽的消息将自动回复这段内容..."
+        placeholder-class="input-ph"
+        maxlength="100"
+        auto-height
+        show-confirm-bar="{{false}}" />
+      <view class="reply-count">{{config.autoReply.length}}/100</view>
+    </view>
+  </view>
+
+  <!-- 屏蔽日志 -->
+  <view class="section" wx:if="{{logs.length > 0}}">
+    <view class="section-title-row">
+      <view class="section-title">屏蔽记录</view>
+      <view class="clear-link" bindtap="clearLogs">清空</view>
+    </view>
+    <view class="card logs-card">
+      <view class="log-item" wx:for="{{logs}}" wx:key="id">
+        <view class="log-icon">{{item.icon}}</view>
+        <view class="log-info">
+          <view class="log-title">{{item.appName}} · {{item.reason}}</view>
+          <view class="log-meta">{{item.timeText}}</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 模拟测试 -->
+  <view class="section">
+    <view class="card test-card">
+      <view class="test-title">模拟测试</view>
+      <view class="test-desc">模拟一条消息进入，看看屏蔽规则是否生效：</view>
+      <input
+        class="test-input"
+        value="{{testMessage}}"
+        bindinput="onTestInput"
+        placeholder="例如：老板说明天9点开会讨论KPI..."
+        placeholder-class="input-ph" />
+      <view class="btn btn-primary btn-block" bindtap="runTest">模拟检测</view>
+    </view>
+  </view>
+
+  <view class="bottom-tip">
+    本功能为心理边界提醒工具，不能真实控制其他APP通知。建议配合手机系统的勿扰模式使用。
+  </view>
+
+</view>

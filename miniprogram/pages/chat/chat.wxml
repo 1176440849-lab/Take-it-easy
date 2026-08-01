@@ -1,0 +1,147 @@
+<!-- pages/chat/chat.wxml - AI情绪急救对话页 -->
+<view class="page-chat">
+
+  <!-- 顶部状态栏 -->
+  <view class="chat-header" style="padding-top:{{statusBarHeight}}px">
+    <view class="header-inner">
+      <view class="header-back" bindtap="onBack">‹</view>
+      <view class="header-info">
+        <view class="header-title">情绪急救</view>
+        <view class="header-meta">
+          <text wx:if="{{emotionTag}}" class="header-emotion">{{emotionTag.emoji}} {{emotionTag.label}}</text>
+          <text class="header-quota">剩余 {{remaining}}/{{limit}} 次</text>
+        </view>
+      </view>
+      <view class="header-end" bindtap="onEndSession" wx:if="{{messages.length > 1}}">结束</view>
+    </view>
+  </view>
+
+  <!-- 情绪标签选择（首次进入时） -->
+  <view class="emotion-select" wx:if="{{!emotionTag}}">
+    <view class="es-emoji">🌸</view>
+    <view class="es-title">此刻你是什么感受？</view>
+    <view class="es-desc">选择一个最贴近的情绪标签，我会更好地陪伴你</view>
+    <view class="es-tags">
+      <view
+        wx:for="{{emotionTags}}"
+        wx:key="id"
+        class="es-tag"
+        style="border-color:{{item.color}};color:{{item.color}}"
+        bindtap="selectEmotion"
+        data-id="{{item.id}}">
+        <text class="es-tag-emoji">{{item.emoji}}</text>
+        <text>{{item.label}}</text>
+      </view>
+    </view>
+    <view class="es-skip" bindtap="skipEmotion">跳过，直接开始</view>
+  </view>
+
+  <!-- 消息列表 -->
+  <scroll-view
+    wx:if="{{emotionTag}}"
+    class="msg-list"
+    scroll-y
+    scroll-into-view="{{scrollToId}}"
+    scroll-with-animation
+    enhanced
+    show-scrollbar="{{false}}">
+    
+    <!-- AI开场白 -->
+    <view class="msg-row ai" id="msg-welcome">
+      <view class="avatar ai-avatar">缓</view>
+      <view class="bubble ai-bubble">
+        {{welcomeText}}
+      </view>
+    </view>
+
+    <view wx:for="{{messages}}" wx:key="id" id="msg-{{item.id}}" class="msg-row {{item.role}}">
+      <view wx:if="{{item.role === 'ai'}}" class="avatar ai-avatar">缓</view>
+      <view class="bubble {{item.role}}-bubble">
+        <text>{{item.content}}</text>
+        <view wx:if="{{item.streaming}}" class="typing-cursor"></view>
+      </view>
+      <view wx:if="{{item.role === 'user'}}" class="avatar user-avatar">我</view>
+    </view>
+
+    <!-- 危机提示横幅 -->
+    <view wx:if="{{showCrisisBanner}}" class="crisis-banner" id="msg-crisis">
+      <view class="cb-icon">🆘</view>
+      <view class="cb-content">
+        <view class="cb-title">请立即寻求帮助</view>
+        <view class="cb-desc">你刚才的话让我很担心。请拨打24小时心理援助热线：</view>
+        <view class="cb-phone" bindtap="callHotline">400-161-9995</view>
+      </view>
+    </view>
+
+    <!-- AI正在输入 -->
+    <view wx:if="{{aiThinking}}" class="msg-row ai">
+      <view class="avatar ai-avatar">缓</view>
+      <view class="bubble ai-bubble thinking">
+        <view class="dot"></view>
+        <view class="dot"></view>
+        <view class="dot"></view>
+      </view>
+    </view>
+
+    <view class="msg-bottom" id="msg-bottom"></view>
+  </scroll-view>
+
+  <!-- 危机关键词命中提示（输入侧） -->
+  <view wx:if="{{emotionTag && !showCrisisBanner}}" class="crisis-hint">
+    如果你正在经历强烈的痛苦或有伤害自己的想法，请立即拨打
+    <text class="crisis-hint-phone" bindtap="callHotline">400-161-9995</text>
+  </view>
+
+  <!-- 输入区 -->
+  <view wx:if="{{emotionTag}}" class="input-bar" style="padding-bottom:{{safeBottom}}px">
+    <view class="quick-tags" wx:if="{{messages.length <= 2 && showQuickTags}}">
+      <view class="qt-item" wx:for="{{quickStarts}}" wx:key="*this" bindtap="quickSend" data-text="{{item}}">
+        {{item}}
+      </view>
+    </view>
+    <view class="input-row">
+      <textarea
+        class="input-text"
+        value="{{inputText}}"
+        bindinput="onInput"
+        bindconfirm="onSend"
+        placeholder="想到什么，说什么..."
+        placeholder-class="input-ph"
+        confirm-type="send"
+        auto-height
+        maxlength="500"
+        show-confirm-bar="{{false}}"
+        adjust-position="{{true}}"
+        cursor-spacing="20"
+        disabled="{{aiThinking}}" />
+      <view class="send-btn {{(inputText && !aiThinking) ? 'active' : ''}}" bindtap="onSend">
+        <view class="send-icon">›</view>
+      </view>
+    </view>
+  </view>
+
+</view>
+
+<!-- 结束会话弹窗 - 满意度评分 -->
+<view class="modal-mask" wx:if="{{showEndModal}}" catchtap="cancelEnd">
+  <view class="end-modal" catchtap="noop">
+    <view class="em-emoji">🌿</view>
+    <view class="em-title">本次对话对你有帮助吗？</view>
+    <view class="em-desc">你的反馈能让我变得更好</view>
+    <view class="em-scores">
+      <view
+        wx:for="{{scoreOptions}}"
+        wx:key="value"
+        class="em-score {{satisfactionScore === item.value ? 'selected' : ''}}"
+        bindtap="selectScore"
+        data-score="{{item.value}}">
+        <text class="em-score-emoji">{{item.emoji}}</text>
+        <text class="em-score-label">{{item.label}}</text>
+      </view>
+    </view>
+    <view class="em-actions">
+      <view class="btn btn-ghost" bindtap="cancelEnd">取消</view>
+      <view class="btn btn-primary" bindtap="confirmEnd">提交并结束</view>
+    </view>
+  </view>
+</view>
